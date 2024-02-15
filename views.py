@@ -77,3 +77,13 @@ def update_game():
 
     return redirect(url_for('index'))
     
+@app.route("/delete/<int:id>")
+def delete(id):
+    if 'user_logged_in' not in session or session['user_logged_in'] is None:
+        return redirect(url_for('login'))
+
+    Games.query.filter_by(id=id).delete()
+    db.session.commit()
+    flash('Game has been deleted successfully')
+    return redirect(url_for('index'))
+
