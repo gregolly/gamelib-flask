@@ -46,13 +46,13 @@ def create_game():
     category = request.form['category']
     console = request.form['console']
     
-    game = Games.query.filter_by(nome=name).first()
+    game = Games.query.filter_by(name=name).first()
 
     if game:
         flash('Game already exists!')
         return redirect(url_for('index'))
 
-    new_game = Games(nome=name, categoria=category, console=console)
+    new_game = Games(name=name, category=category, console=console)
     db.session.add(new_game)
     db.session.commit()
     flash('Game created successfully!')
