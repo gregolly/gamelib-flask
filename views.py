@@ -65,21 +65,15 @@ def edit(id):
     game = Games.query.get(id)
     return render_template('edit.html', title='Editing Game', game=game)
 
-@app.route('/update/<int:id>', methods=['POST'])
-def update_game(id):
-    name = request.form['name']
-    category = request.form['category']
-    console = request.form['console']
-    
-    game = Games.query.get(id)
+@app.route('/update', methods=['POST'])
+def update_game():
+    game = Games.query.filter_by(id=request.form['id']).first()
+    game.name = request.form['name']
+    game.category = request.form['category']
+    game.console = request.form['console']
 
-    if game:
-        game.name = name
-        game.category = category
-        game.console = console
-        db.session.commit()
-        flash('Game updated successfully!')
-    else:
-        flash('Game not found')
+    db.session.add(game)
+    db.session.commit()
 
     return redirect(url_for('index'))
+    
