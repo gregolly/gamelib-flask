@@ -1,6 +1,7 @@
 from models import Users, Games
 from gamelib import app, db
-from flask import render_template, request, redirect, session, flash, url_for
+from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
+from config import UPLOAD_PATH
 
 @app.route('/')
 def index():
@@ -55,6 +56,10 @@ def create_game():
     new_game = Games(name=name, category=category, console=console)
     db.session.add(new_game)
     db.session.commit()
+
+    file = request.files['file']
+    file.save(f'{UPLOAD_PATH}/cover{new_game.id}.jpg')
+
     flash('Game created successfully!')
     return redirect(url_for('index'))
 
@@ -86,4 +91,8 @@ def delete(id):
     db.session.commit()
     flash('Game has been deleted successfully')
     return redirect(url_for('index'))
+
+@app.route("/uploads/<filename>")
+def image(filename):
+    return send_from_directory('uploads', filename)
 
