@@ -1,3 +1,5 @@
+import os
+
 SECRET_KEY = 'your secret key'
 
 SQLALCHEMY_DATABASE_URI = \
@@ -8,3 +10,5 @@ SQLALCHEMY_DATABASE_URI = \
     server = 'localhost',
     database = 'gamelib'
 )
+
+UPLOAD_PATH = os.path.dirname(os.path.abspath(__file__)) + '/uploads'
