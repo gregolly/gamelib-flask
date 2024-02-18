@@ -6,6 +6,7 @@
     <title>Gamelib</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='reset.css') }}">
 </head>
 <body>
     {% with messages = get_flashed_messages() %}
@@ -17,14 +18,33 @@
         </ul>
     {% endif %}
     {% endwith %}
-    <div class="container">
-      <div class="page-header">
-          <h1>{{ title }}</h1>
-      </div>
+    <div class="bg-light py-3 min-vh-100">
+        <div class="container">
+        <div class="page-header">
+            <header>
+                <nav>
+                    <ul class="d-flex gap-3">
+                        <li>
+                            <a class="text-color link-dark text-decoration-none" href="{{ url_for('index')}}">Home</a>
+                        </li>
+                        <li>
+                            <a class="text-color link-dark text-decoration-none" href="{{ url_for('new')}}">New game</a>
+                        </li>
+                        <li>
+                            <a class="text-color link-dark text-decoration-none" href="{{ url_for('logout')}}">Logout</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+        </div>
+        <h1 class="fs-5 mt-5">{{ title }}</h1>
 
-      {% block conteudo %} 
-      {% endblock %}
+        {% block conteudo %} 
+        {% endblock %}
 
+        </div>
     </div>
+    <script src="{{ url_for('static', filename='jquery.js') }}"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
