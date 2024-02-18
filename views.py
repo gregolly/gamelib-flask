@@ -2,6 +2,8 @@ from models import Users, Games
 from gamelib import app, db
 from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
 from config import UPLOAD_PATH
+from helpers import recover_image, delete_file
+import time
 
 @app.route('/')
 def index():
@@ -58,7 +60,8 @@ def create_game():
     db.session.commit()
 
     file = request.files['file']
-    file.save(f'{UPLOAD_PATH}/cover{new_game.id}.jpg')
+    timestamp = time.time()
+    file.save(f'{UPLOAD_PATH}/cover{new_game.id}-{timestamp}.jpg')
 
     flash('Game created successfully!')
     return redirect(url_for('index'))
@@ -68,7 +71,8 @@ def edit(id):
     if 'user_logged_in' not in session or session['user_logged_in'] is None:
         return redirect(url_for('login'))
     game = Games.query.get(id)
-    return render_template('edit.html', title='Editing Game', game=game)
+    cover_game = recover_image(id)
+    return render_template('edit.html', title='Editing Game', game=game, cover_game=cover_game)
 
 @app.route('/update', methods=['POST'])
 def update_game():
@@ -76,6 +80,11 @@ def update_game():
     game.name = request.form['name']
     game.category = request.form['category']
     game.console = request.form['console']
+
+    file = request.files['file']
+    timestamp = time.time()
+    delete_file(game.id)
+    file.save(f'{UPLOAD_PATH}/cover{game.id}-{timestamp}.jpg')
 
     db.session.add(game)
     db.session.commit()
@@ -95,4 +104,3 @@ def delete(id):
 @app.route("/uploads/<filename>")
 def image(filename):
     return send_from_directory('uploads', filename)
-
