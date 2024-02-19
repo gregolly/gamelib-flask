@@ -1,6 +1,6 @@
 {% extends "template.html" %}
 {% block conteudo %}
-      <form action="{{ url_for('update_game', id=game.id)}}" method="post" enctype="multipart/form-data" class="mt-3">
+      <form action="{{ url_for('update_game', id=id)}}" method="post" enctype="multipart/form-data" class="mt-3">
         <figure class="img-thumbnail col-md-4">
           <img class="img-fluid" src="{{ url_for('image', filename=cover_game) }}" alt="">
           <figcaption>
@@ -11,20 +11,23 @@
           </figcaption>
         </figure>
         <fieldset>
-          <input type="hidden" name="id" value="{{ game.id }}">
+          <input type="hidden" name="id" value="{{ id }}">
+          {{ form.csrf_token() }}
           <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" class="form-control" value="{{ game.name }}">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control") }}
+          </div>
+          <div class="form-group">  
+              {{ form.category.label(class="form-label") }}
+              {{ form.category(class="form-control") }}
           </div>
           <div class="form-group">
-            <label for="category">Category</label>
-            <input type="text" id="category" name="category" class="form-control" value="{{ game.category }}">
+              {{ form.console.label(class="form-label") }}
+              {{ form.console(class="form-control") }}
           </div>
-          <div class="form-group">
-            <label for="console">Console</label>
-            <input type="text" id="console" name="console" class="form-control" value="{{ game.console }}">
+          <div>
+              {{ form.save(class="btn btn-primary") }}
           </div>
-          <button type="submit" class="btn btn-primary btn-salvar">Save</button>
         </fieldset>
       </form>
 {% endblock %}

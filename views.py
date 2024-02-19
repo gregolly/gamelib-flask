@@ -2,30 +2,33 @@ from models import Users, Games
 from gamelib import app, db
 from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
 from config import UPLOAD_PATH
-from helpers import recover_image, delete_file
+from helpers import recover_image, delete_file, GameForm, LoginForm
 import time
 
 @app.route('/')
 def index():
-    return render_template('signin.html', )
+    next = request.args.get('next')
+    form = LoginForm()
+    return render_template('signin.html', next=next, form=form)
 
-@app.route('/login')
+@app.route('/home')
 def sign_in():
     games = Games.query.order_by(Games.id)
     return render_template('list.html', title='Games', games=games)
 
 @app.route('/authentication', methods=['POST'])
 def authentication():
-    user = Users.query.filter_by(nickname=request.form['username']).first()
+    form = LoginForm(request.form)
+    user = Users.query.filter_by(nickname=form.username.data).first()
     if user:
-        if request.form['password'] == user.password:
+        if form.password.data == user.password:
             session['user_logged_in'] = user.name
             flash(f"User has been logged in successfully")
             return redirect("index")
-    if '123' == request.form['password']:
-        username = session['user_logged_in'] = request.form['username']
+    if '123' == form.password.data:
+        username = session['user_logged_in'] = form.username.data
         flash(f"User {username} has been logged in successfully")
-        return redirect('login')
+        return redirect('home')
     else:
         flash(f"Not authenticated")
         return redirect(url_for('signin'))
@@ -39,14 +42,19 @@ def logout():
 @app.route('/new')
 def new():
     if 'user_logged_in' not in session or session['user_logged_in'] is None:
-        return redirect(url_for('login'))
-    return render_template('form.html', title='New Game')
+        return redirect(url_for('home'))
+    form = GameForm()
+    return render_template('form.html', title='New Game', form=form)
 
 @app.route('/create', methods=['POST'])
 def create_game():
-    name = request.form['name']
-    category = request.form['category']
-    console = request.form['console']
+    form = GameForm(request.form)
+    if not form.validate_on_submit():
+        return redirect(url_for('new'))
+    
+    name = form.name.data
+    category = form.category.data
+    console = form.console.data
     
     game = Games.query.filter_by(name=name).first()
 
@@ -68,33 +76,41 @@ def create_game():
 @app.route('/edit/<int:id>')
 def edit(id):
     if 'user_logged_in' not in session or session['user_logged_in'] is None:
-        # return redirect(url_for('login'))
+        # return redirect(url_for('home'))
         return render_template('signin.html', next=next)
     game = Games.query.get(id)
+    form = GameForm()
+    form.name.data = game.name
+    form.category.data = game.category
+    form.console.data = game.console
     cover_game = recover_image(id)
-    return render_template('edit.html', title='Editing Game', game=game, cover_game=cover_game)
+    return render_template('edit.html', title='Editing Game', id=id, cover_game=cover_game, form=form)
 
 @app.route('/update', methods=['POST'])
 def update_game():
-    game = Games.query.filter_by(id=request.form['id']).first()
-    game.name = request.form['name']
-    game.category = request.form['category']
-    game.console = request.form['console']
+    form = GameForm(request.form)
 
-    file = request.files['file']
-    timestamp = time.time()
-    delete_file(game.id)
-    file.save(f'{UPLOAD_PATH}/cover{game.id}-{timestamp}.jpg')
+    if form.validate_on_submit():
+        game = Games.query.filter_by(id=request.form['id']).first()
+        game.name = form.name.data
+        game.category = form.category.data
+        game.console = form.console.data
 
-    db.session.add(game)
-    db.session.commit()
+        file = request.files['file']
+        timestamp = time.time()
+        delete_file(game.id)
+        file.save(f'{UPLOAD_PATH}/cover{game.id}-{timestamp}.jpg')
 
-    return redirect(url_for('index'))
+        db.session.add(game)
+        db.session.commit()
+
+    games = Games.query.order_by(Games.id)
+    return render_template('list.html', title='Games', games=games)
     
 @app.route("/delete/<int:id>")
 def delete(id):
     if 'user_logged_in' not in session or session['user_logged_in'] is None:
-        return redirect(url_for('login'))
+        return redirect(url_for('home'))
 
     Games.query.filter_by(id=id).delete()
     db.session.commit()

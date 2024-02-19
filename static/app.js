@@ -12,4 +12,20 @@ $('form input[type="file"]').change(event => {
           alert('Formato não suportado')
         }
     }
-  });
+});
+
+$(document).ready(function() {
+  var fadeOutDuration = 3000;
+
+  setTimeout(function() {
+      $('#messages').fadeOut();
+  }, fadeOutDuration);
+});
+
+$(document).ready(function() {
+  const path = location.pathname
+
+  if (path === "/") {
+    document.querySelector('.page-header').classList.add('hidden')
+  }
+});
