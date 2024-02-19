@@ -18,10 +18,10 @@ def sign_in():
 def authentication():
     user = Users.query.filter_by(nickname=request.form['username']).first()
     if user:
-        if request.form['password'] == user.senha:
-            session['user_logged_in'] = user.nome
+        if request.form['password'] == user.password:
+            session['user_logged_in'] = user.name
             flash(f"User has been logged in successfully")
-            return redirect("login")
+            return redirect("index")
     if '123' == request.form['password']:
         username = session['user_logged_in'] = request.form['username']
         flash(f"User {username} has been logged in successfully")
