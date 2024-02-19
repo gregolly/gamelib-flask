@@ -7,13 +7,12 @@ import time
 
 @app.route('/')
 def index():
-    games = Games.query.order_by(Games.id)
-    return render_template('list.html', title='Games', games=games)
+    return render_template('signin.html', )
 
 @app.route('/login')
 def sign_in():
-    next = request.args.get('next')
-    return render_template('signin.html', next=next)
+    games = Games.query.order_by(Games.id)
+    return render_template('list.html', title='Games', games=games)
 
 @app.route('/authentication', methods=['POST'])
 def authentication():
@@ -22,11 +21,11 @@ def authentication():
         if request.form['password'] == user.senha:
             session['user_logged_in'] = user.nome
             flash(f"User has been logged in successfully")
-            return redirect("/new")
+            return redirect("login")
     if '123' == request.form['password']:
         username = session['user_logged_in'] = request.form['username']
         flash(f"User {username} has been logged in successfully")
-        return redirect('/new')
+        return redirect('login')
     else:
         flash(f"Not authenticated")
         return redirect(url_for('signin'))
@@ -69,7 +68,8 @@ def create_game():
 @app.route('/edit/<int:id>')
 def edit(id):
     if 'user_logged_in' not in session or session['user_logged_in'] is None:
-        return redirect(url_for('login'))
+        # return redirect(url_for('login'))
+        return render_template('signin.html', next=next)
     game = Games.query.get(id)
     cover_game = recover_image(id)
     return render_template('edit.html', title='Editing Game', game=game, cover_game=cover_game)
