@@ -18,7 +18,7 @@ def authentication():
     if user and password:
         session['user_logged_in'] = user.name
         flash(f"User has been logged in successfully")
-        return redirect("index")
+        return redirect("home")
     else:
         flash(f"Not authenticated")
         return redirect(url_for('signin'))
