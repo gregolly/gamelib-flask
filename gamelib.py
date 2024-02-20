@@ -5,10 +5,10 @@ from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.config.from_pyfile("config.py")
-bcrypt = Bcrypt(app)
 
 db = SQLAlchemy(app)
 csrf = CSRFProtect(app)
+bcrypt = Bcrypt(app)
 
 from views_game import *
 from views_user import *

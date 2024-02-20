@@ -1,7 +1,7 @@
 from gamelib import app
 from flask import render_template, request, redirect, session, flash, url_for
-from helpers import LoginForm
 from models import Users
+from helpers import LoginForm
 from flask_bcrypt import check_password_hash
 
 @app.route('/')

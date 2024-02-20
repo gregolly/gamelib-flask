@@ -1,6 +1,6 @@
-from models import Games
-from gamelib import app, db
 from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
+from gamelib import app, db
+from models import Games
 from config import UPLOAD_PATH
 from helpers import recover_image, delete_file, GameForm, LoginForm
 import time
@@ -9,7 +9,6 @@ import time
 def sign_in():
     games = Games.query.order_by(Games.id)
     return render_template('list.html', title='Games', games=games)
-
 
 @app.route('/new')
 def new():
