@@ -1,43 +1,15 @@
-from models import Users, Games
+from models import Games
 from gamelib import app, db
 from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
 from config import UPLOAD_PATH
 from helpers import recover_image, delete_file, GameForm, LoginForm
 import time
 
-@app.route('/')
-def index():
-    next = request.args.get('next')
-    form = LoginForm()
-    return render_template('signin.html', next=next, form=form)
-
 @app.route('/home')
 def sign_in():
     games = Games.query.order_by(Games.id)
     return render_template('list.html', title='Games', games=games)
 
-@app.route('/authentication', methods=['POST'])
-def authentication():
-    form = LoginForm(request.form)
-    user = Users.query.filter_by(nickname=form.username.data).first()
-    if user:
-        if form.password.data == user.password:
-            session['user_logged_in'] = user.name
-            flash(f"User has been logged in successfully")
-            return redirect("index")
-    if '123' == form.password.data:
-        username = session['user_logged_in'] = form.username.data
-        flash(f"User {username} has been logged in successfully")
-        return redirect('home')
-    else:
-        flash(f"Not authenticated")
-        return redirect(url_for('signin'))
-
-@app.route('/logout')
-def logout():
-    session['user_logged_in'] = None
-    flash('Logout has been done successfully')
-    return redirect(url_for("index"))
 
 @app.route('/new')
 def new():
